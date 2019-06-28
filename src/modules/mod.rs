@@ -17,4 +17,9 @@ pub trait Semigroup {
     fn f_over_m(&self) -> f64 {
         self.f() as f64 / self.m() as f64
     }
+    fn distance_to_f_over_m(&self) -> i64 {
+        let d1 = self.f() as i64 - (self.f() as i64/ self.m() as i64) * self.m() as i64;
+        let d2 = self.f() as i64 - ((self.f() as i64/ self.m() as i64)+1) * self.m() as i64;
+        if d2.abs() < d1 { d2 } else { d1 }
+    }
 }
