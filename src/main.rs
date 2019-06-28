@@ -27,7 +27,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
 
     print!("{}", head);
 
-    let mut end_slice=start+3;
+    let mut end_slice=start+20;
 
     for begin_slice in start..stop {
 
@@ -58,7 +58,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
             if saturated {
                 break;
             }
-            end_slice+=1;
+            end_slice+=end_slice/10; // wächst um 10%
         }
     }
 }
