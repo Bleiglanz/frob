@@ -46,11 +46,11 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, factor1: u
 
     //let raw:Vec<usize>= primal::Primes::all().take(8000000).collect();
 
-    let raw:Vec<usize> = (1..8000000).map(|x|{x*x*x}).collect();
+    let raw:Vec<usize> = (1..8000000).map(|x|{(x*(3*x-1))/2}).collect();
 
     let full = prepare_generators(modul,residue,&raw);
 
-    let mut out = std::fs::File::create(format!("./outsat_mod{}residue{},{}pto{}p_n{}to{}.csv", modul, residue, factor1, factor2, start, stop)).expect("Unable to create file");
+    let mut out = std::fs::File::create(format!("./pentagooutsat_mod{}residue{},{}pto{}p_n{}to{}.csv", modul, residue, factor1, factor2, start, stop)).expect("Unable to create file");
     let head = "       n;     n+k;       k;modul; resi;fak1;fak2;     p_n;    p_n+1;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-..m(S); stable; f/p\n";
     out.write_all(head.as_bytes()).expect("head?");
 
@@ -64,7 +64,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, factor1: u
 
             let gens: &[usize] = &full[minindex..i];
 
-            if gens.len() < 2 { continue; };
+            if gens.len() < 3 { continue; };
 
             let res2: Fast = { fast(&gens) };
 
