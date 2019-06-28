@@ -14,4 +14,7 @@ pub trait Semigroup {
     fn sum_apery(&self)-> usize;
     fn count_set(&self) -> usize;
     fn count_gap(&self) -> usize;
+    fn f_over_m(&self) -> f64 {
+        self.f() as f64 / self.m() as f64
+    }
 }

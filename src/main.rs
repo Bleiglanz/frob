@@ -69,7 +69,7 @@ fn frobenius(modul:usize, residue:usize, start: usize, stop: usize, factor1: usi
                                       assert!(!iterate || res2.f()+1 <= primes[i], "if stable, the next prime should be writeable");
                                       "stable S"
                                   } else {""},
-                                  res2.f() as f64 / res2.g1 as f64,
+                                  res2.f_over_m(),
 
             );
 
