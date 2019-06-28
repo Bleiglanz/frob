@@ -1,0 +1,12 @@
+[package]
+name = "frob"
+version = "0.1.0"
+authors = ["Anton Rechenauer <antonrechenauer@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6.1"
+dotenv = "0.10.1"
+primal = "0.2"
+clap = "2.33"
+crossbeam = "0.7"
