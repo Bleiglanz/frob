@@ -13,78 +13,52 @@ fn prepare_generators(modul: usize, residue: usize, allgen:&[usize]) -> Vec<usiz
 
 }
 
-fn slice_generators(skip:usize, factor1: usize, factor2: usize, iterate: bool, allgen:&[usize])->(usize,usize,usize){
+fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
 
-    fn findindex(s: &[usize], start: usize, factor: usize) -> usize {
-        if 1 == factor {
-            start
-        } else {
-            let mut max = start;
-            loop {
-                if s[max] < factor * s[start] {
-                    max = max + 1;
-                } else {
-                    break;
-                }
-            }
-            max
-        }
-    }
+    let raw:Vec<usize>= primal::Primes::all().take(8000000).collect();
 
-    let minindex: usize = findindex(allgen, skip, factor1);
-
-    let maxindex: usize = findindex(allgen, skip, factor2) + 1;
-
-    let startindex: usize = if iterate { minindex + 1 } else { maxindex - 1 };
-
-    (startindex,minindex,maxindex)
-}
-
-
-
-fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, factor1: usize, factor2: usize, iterate: bool) {
-
-    //let raw:Vec<usize>= primal::Primes::all().take(8000000).collect();
-
-    let raw:Vec<usize> = (1..8000000).map(|x|{(x*(3*x-1))/2}).collect();
+    //let raw:Vec<usize> = (1..8000000).map(|x|{(x*(3*x-1))/2}).collect();
 
     let full = prepare_generators(modul,residue,&raw);
 
-    let mut out = std::fs::File::create(format!("./pentagooutsat_mod{}residue{},{}pto{}p_n{}to{}.csv", modul, residue, factor1, factor2, start, stop)).expect("Unable to create file");
-    let head = "       n;     n+k;       k;modul; resi;fak1;fak2;     p_n;    p_n+1;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-..m(S); stable; f/p\n";
+    let mut out = std::fs::File::create(format!("./outsat_mod{}residue{},p_n{}to{}.csv", modul, residue, start, stop)).expect("Unable to create file");
+    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-..m(S); stable; f/p\n";
     out.write_all(head.as_bytes()).expect("head?");
 
     print!("{}", head);
 
-    for skip in start..stop {
+    let mut end_slice=start+3;
 
-        let (startindex,minindex,maxindex) = slice_generators(skip,factor1,factor2,iterate,&full);
+    for begin_slice in start..stop {
 
-        for i in startindex..maxindex {
+        loop {
 
-            let gens: &[usize] = &full[minindex..i];
+            let gens: &[usize] = &full[begin_slice..end_slice];
 
             if gens.len() < 3 { continue; };
 
             let res2: Fast = { fast(&gens) };
 
-            let ausgabe = format!("{:8};{:8};{:8};{:5};{:5};{:4};{:4};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:.6}\n",
-                                  skip + 1, i, i - (skip + 1),
+            let saturated:bool = res2.f() + 1 <= full[end_slice];
+
+            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:.6}\n",
                                   modul, residue,
-                                  factor1, factor2,
-                                  full[minindex], full[minindex + 1], full[i - 1],
+                                  begin_slice, end_slice,
+                                  full[begin_slice], full[end_slice - 1],
                                   res2.m(), res2.e(),
                                   res2.count_set, res2.f(), res2.distance_to_f_over_m(),
-                                  if res2.f() + 1 <= full[i] { "saturated S" } else { "" },
+                                  if saturated { "saturated S" } else { "          " },
                                   res2.f_over_m(),
             );
+
 
             print!("{}", ausgabe);
 
             out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
-            if res2.f() + 1 <= full[i] {
+            if saturated {
                 break;
             }
+            end_slice+=1;
         }
     }
 }
@@ -114,21 +88,6 @@ fn main() {
             .required(true)
             .default_value("12")
         )
-        .arg(Arg::with_name("factor1")
-            .help("take all primes as generators factor1*p_start <= gen  < factor2*p_start")
-            .required(true)
-            .default_value("1")
-        )
-        .arg(Arg::with_name("factor2")
-            .help("take all primes as generators factor1*p_start <= gen  < factor2*p_start")
-            .required(true)
-            .default_value("6")
-        )
-        .arg(Arg::with_name("iterate")
-            .help("if 1, take all intermediate semigroups p_n....p_n+k")
-            .required(true)
-            .default_value("0")
-        )
         .get_matches();
 
     let modul: usize = matches.value_of("modul").unwrap().parse().unwrap();
@@ -137,10 +96,5 @@ fn main() {
     let start: usize = matches.value_of("start").unwrap().parse().unwrap();
     let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
 
-    let factor1: usize = matches.value_of("factor1").unwrap().parse().unwrap();
-    let factor2: usize = matches.value_of("factor2").unwrap().parse().unwrap();
-
-    let iterate: usize = matches.value_of("iterate").unwrap().parse().unwrap();
-
-    frobenius(modul, residue, start, stop, factor1, factor2, iterate != 0);
+    frobenius(modul, residue, start, stop);
 }
