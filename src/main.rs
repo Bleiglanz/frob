@@ -3,6 +3,7 @@ extern crate crossbeam;
 
 use clap::{Arg, App};
 use frob::modules::fast_semigroup::{Fast, fast};
+use frob::modules::Semigroup;
 use std::io::Write;
 
 fn frobenius(modul:usize, residue:usize, start: usize, stop: usize, factor1: usize, factor2: usize, iterate:bool) {
@@ -49,8 +50,8 @@ fn frobenius(modul:usize, residue:usize, start: usize, stop: usize, factor1: usi
 
             let res2: Fast = if iterate { fast(&gens) } else { stable.clone() };//&primes[skip..maxindex]);
 
-            let d1 = res2.maxgap as i64 - (res2.maxgap as i64/ res2.g1 as i64) * res2.g1 as i64;
-            let d2 = res2.maxgap as i64 - ((res2.maxgap as i64/ res2.g1 as i64)+1) * res2.g1 as i64;
+            let d1 = res2.f() as i64 - (res2.f() as i64/ res2.g1 as i64) * res2.g1 as i64;
+            let d2 = res2.f() as i64 - ((res2.f() as i64/ res2.g1 as i64)+1) * res2.g1 as i64;
             let delta = if d2.abs() < d1 {d2} else {d1};
 
             let ausgabe = format!("{:8};{:8};{:8};{:5};{:5};{:4};{:4};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:.6}\n",
@@ -59,18 +60,23 @@ fn frobenius(modul:usize, residue:usize, start: usize, stop: usize, factor1: usi
                                   factor1, factor2,
                                   first, primes[minindex+1], primes[i - 1],
                                   res2.g1, res2.e,
-                                  res2.count_set, res2.maxgap,delta,
-                                  if stable.maxgap==res2.maxgap && stable.count_set==res2.count_set {
+                                  res2.count_set, res2.f(), delta,
+                                  if stable.f()==res2.f() && stable.count_set==res2.count_set {
+                                      dbg!(primes[i-1]);
+                                      dbg!(&res2.c());
+                                      dbg!(primes[i]);
+                                      dbg!(stable.c());
+                                      assert!(!iterate || res2.f()+1 <= primes[i], "if stable, the next prime should be writeable");
                                       "stable S"
                                   } else {""},
-                                  res2.maxgap as f64 / res2.g1 as f64,
+                                  res2.f() as f64 / res2.g1 as f64,
 
             );
 
             print!("{}", ausgabe);
 
             out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
-            if stable.maxgap==res2.maxgap && stable.count_set==res2.count_set {
+            if stable.f()==res2.f() && stable.count_set==res2.count_set {
                 break;
             }
         }

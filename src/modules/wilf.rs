@@ -1,4 +1,4 @@
-use super::gcd_vec;
+use super::math::gcd_vec;
 
 #[derive(Debug)]
 pub struct WilfSet {

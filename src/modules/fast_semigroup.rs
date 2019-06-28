@@ -1,28 +1,37 @@
+use super::Semigroup;
+
 #[derive(Debug, Clone)]
 pub struct Fast {
     pub max_a: usize,
     pub sum_a: usize,
-    pub maxgap: usize,
     pub g1: usize,
     pub count_set: usize,
     pub count_gap: usize,
     pub e: usize,
-    pub c: usize,
 }
+
+impl Semigroup for Fast {
+    fn e(&self) -> usize { self.e }
+    fn f(&self) -> usize { self.max_a - self.g1 }
+    fn c(&self) -> usize { self.max_a - self.g1 +1 }
+    fn m(&self) -> usize { self.g1 }
+    fn max_apery(&self)-> usize { self.max_a }
+    fn sum_apery(&self)-> usize { self.sum_a }
+    fn count_set(&self) -> usize { self.count_set }
+    fn count_gap(&self) -> usize { self.count_gap }
+}
+
 
 impl Fast {
     fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize) -> Self {
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
-        let c = max_a-g1+1;
         Fast {
-            max_a:max_a,
+            max_a,
             sum_a: sum,
-            g1: g1,
-            maxgap: max_a - g1,
+            g1,
             count_set,
-            count_gap: count_gap,
+            count_gap,
             e: mingencount,
-            c,
         }
     }
 }
