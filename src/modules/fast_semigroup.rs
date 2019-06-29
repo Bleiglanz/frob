@@ -2,6 +2,7 @@ use super::Semigroup;
 
 #[derive(Debug, Clone)]
 pub struct Fast {
+    apery: Vec<usize>,
     pub max_a: usize,
     pub sum_a: usize,
     pub g1: usize,
@@ -19,11 +20,12 @@ impl Semigroup for Fast {
     fn sum_apery(&self)-> usize { self.sum_a }
     fn count_set(&self) -> usize { self.count_set }
     fn count_gap(&self) -> usize { self.count_gap }
+    fn contains(&self,n:usize) -> bool { self.apery[n % self.g1] <= n }
 }
 
 
 impl Fast {
-    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize) -> Self {
+    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>) -> Self {
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         Fast {
             max_a,
@@ -32,6 +34,7 @@ impl Fast {
             count_set,
             count_gap,
             e: mingencount,
+            apery
         }
     }
 }
@@ -101,5 +104,5 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
         }
     }
 
-    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery)
+    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset)
 }

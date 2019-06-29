@@ -22,4 +22,5 @@ pub trait Semigroup {
         let d2 = self.f() as i64 - ((self.f() as i64/ self.m() as i64)+1) * self.m() as i64;
         if d2.abs() < d1 { d2 } else { d1 }
     }
+    fn contains(&self, n:usize) -> bool;
 }
