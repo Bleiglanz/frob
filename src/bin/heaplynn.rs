@@ -7,6 +7,23 @@ use ndarray::{Array2};
 use clap::{Arg, App};
 use std::io::Write;
 
+type Board = Array2<usize>;
+
+fn binexp(m:Board,mut k:usize)->Board{
+
+    let size:usize = *m.shape().first().unwrap();
+    let mut res:Board = Array2::zeros((size,size));
+    for i in 0..size { res[[i,i]]=1; };
+    let mut x = m.clone();
+    while k > 0 {
+        if k % 2 == 1 {
+            res = res.dot(&x);
+        }
+        x = x.dot(&x);
+        k = k / 2; //Ganzzahlige Division (das Ergebnis wird abgerundet)
+    }
+    res
+}
 
 
 fn cellvalue(gen:&[usize],i:usize,j:usize) -> usize {
@@ -16,7 +33,7 @@ fn cellvalue(gen:&[usize],i:usize,j:usize) -> usize {
 
 fn heaplynn(gen:&[usize])-> usize {
 
-    type Board = Array2<usize>;
+
     let maxgen = *gen.iter().max().unwrap();
     let mut m:Board = Board::from_elem((maxgen,maxgen),0);
     for i in 0..maxgen {
@@ -36,6 +53,7 @@ fn heaplynn(gen:&[usize])-> usize {
         fertig = !a.iter().any(|x|{*x==0});
         //println!("Matrix^{}\n {:?}",potenz,a);
     }
+    assert_eq!(a,binexp(m,potenz));
     println!("      Erste-Non-Null-Potenz {:4} berechnet f zu {:8}",potenz,potenz-maxgen);
     use frob::modules::fast_semigroup::fast;
     use frob::modules::Semigroup;
