@@ -95,9 +95,12 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
         hit = false;
         i += 1;
         if windowindex == width - 1 {
-            for j in 0..maximal_input {
-                window[j] = window[j + maximal_input];
-            }
+            //for j in 0..maximal_input {
+            //    window[j] = window[j + maximal_input];
+            //}
+            //copy_within_a_slice(&mut window,maximal_input, 0, maximal_input);
+            let (dst, src) = window.split_at_mut(maximal_input);
+            dst[0..maximal_input].clone_from_slice(&src[..maximal_input]);
             windowindex = maximal_input;
         } else {
             windowindex += 1;
@@ -106,3 +109,13 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
 
     Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset)
 }
+
+//fn copy_within_a_slice<T: Clone>(v: &mut [T], from: usize, to: usize, len: usize) {
+//    if from > to {
+//        let (dst, src) = v.split_at_mut(from);
+//        dst[to..to + len].clone_from_slice(&src[..len]);
+//    } else {
+//        let (src, dst) = v.split_at_mut(to);
+//        dst[..len].clone_from_slice(&src[from..from + len]);
+//    }
+//}

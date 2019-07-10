@@ -1,5 +1,10 @@
 //use super::gcd_vec;
 //use std::collections::HashSet;
+//
+
+
+
+// ältere version, die die erzeuger mitnimmt
 
 #[derive(Debug)]
 pub struct Semi {

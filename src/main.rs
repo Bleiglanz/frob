@@ -48,7 +48,8 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
                                   res2.m(), res2.e(),
                                   res2.count_set, res2.f(), res2.distance_to_f_over_m(),
                                   if saturated { "saturated S" } else { "          " },
-                                  res2.f_over_m(),
+                                  res2.f_over_m()
+                                  ,
             );
 
 
