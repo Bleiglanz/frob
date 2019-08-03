@@ -11,7 +11,7 @@ type Board = Array2<usize>;
 
 fn binexp(m:Board,mut k:usize)->Board{
 
-    let size:usize = *m.shape().first().unwrap();cd
+    let size:usize = *m.shape().first().unwrap();
     let mut res:Board = Array2::zeros((size,size));
     for i in 0..size { res[[i,i]]=1; };
     let mut x = m.clone();
