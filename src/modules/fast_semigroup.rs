@@ -9,6 +9,7 @@ pub struct Fast {
     pub count_set: usize,
     pub count_gap: usize,
     pub e: usize,
+    pub u: usize,
 }
 
 impl Semigroup for Fast {
@@ -16,6 +17,7 @@ impl Semigroup for Fast {
     fn f(&self) -> usize { self.max_a - self.g1 }
     fn c(&self) -> usize { self.max_a - self.g1 +1 }
     fn m(&self) -> usize { self.g1 }
+    fn u(&self) -> usize { self.u }
     fn max_apery(&self)-> usize { self.max_a }
     fn sum_apery(&self)-> usize { self.sum_a }
     fn count_set(&self) -> usize { self.count_set }
@@ -25,7 +27,7 @@ impl Semigroup for Fast {
 
 
 impl Fast {
-    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>) -> Self {
+    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>, u:usize) -> Self {
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         Fast {
             max_a,
@@ -34,7 +36,8 @@ impl Fast {
             count_set,
             count_gap,
             e: mingencount,
-            apery
+            apery,
+            u
         }
     }
 }
@@ -60,6 +63,7 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
     let mut max_apery:usize = m;
     let mut sum_apery:usize = 0;
     let mut minimal_generators:usize = 1;
+    let mut max_atom = m;
     window[0]=0;
     while runlength < m {
         let residue = i % m;
@@ -86,6 +90,7 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
                     if i>max_apery { max_apery = i}
                     if 0==window[windowindex - k] {
                         minimal_generators+=1;
+                        if max_atom < i {max_atom=i};
                     }
                     break;
                 }
@@ -106,8 +111,7 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
             windowindex += 1;
         }
     }
-
-    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset)
+    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset,max_atom)
 }
 
 //fn copy_within_a_slice<T: Clone>(v: &mut [T], from: usize, to: usize, len: usize) {

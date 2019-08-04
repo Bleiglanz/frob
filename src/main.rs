@@ -22,7 +22,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
     let full = prepare_generators(modul,residue,&raw);
 
     let mut out = std::fs::File::create(format!("./outsat_mod{}residue{},p_n{}to{}.csv", modul, residue, start, stop)).expect("Unable to create file");
-    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-..m(S); stable; f/p\n";
+    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S); stable; u(S)\n";
     out.write_all(head.as_bytes()).expect("head?");
 
     print!("{}", head);
@@ -41,24 +41,28 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
 
             let saturated:bool = res2.f() + 1 <= full[end_slice];
 
-            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:.6}\n",
+            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:6}\n",
                                   modul, residue,
-                                  begin_slice, end_slice,
+                                  begin_slice+1, end_slice,
                                   full[begin_slice], full[end_slice - 1],
                                   res2.m(), res2.e(),
-                                  res2.count_set, res2.f(), res2.distance_to_f_over_m(),
+                                  res2.count_set, res2.f(), res2.f() as i64 -3*res2.m() as i64,
                                   if saturated { "saturated S" } else { "          " },
-                                  res2.f_over_m()
+                                  res2.u
                                   ,
             );
 
 
             print!("{}", ausgabe);
-
-            out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
+            if saturated {
+                out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
+            }
             if saturated {
                 break;
             }
+
+
+
             end_slice+=end_slice/10; // wächst um 10%
         }
     }
@@ -82,12 +86,12 @@ fn main() {
         .arg(Arg::with_name("start")
             .help("where to begin, a n th prime")
             .required(true)
-            .default_value("10")
+            .default_value("1")
         )
         .arg(Arg::with_name("stop")
             .help("where to stop, a n th prime")
             .required(true)
-            .default_value("12")
+            .default_value("10")
         )
         .get_matches();
 
