@@ -24,4 +24,5 @@ pub trait Semigroup {
         if d2.abs() < d1 { d2 } else { d1 }
     }
     fn contains(&self, n:usize) -> bool;
+    fn max_even_gap(&self) -> usize;
 }

@@ -23,6 +23,13 @@ impl Semigroup for Fast {
     fn count_set(&self) -> usize { self.count_set }
     fn count_gap(&self) -> usize { self.count_gap }
     fn contains(&self,n:usize) -> bool { self.apery[n % self.g1] <= n }
+    fn max_even_gap(&self) -> usize {
+        let mut meg = 0;
+        for k in 0..self.c() {
+           meg = if !self.contains(k) && 0==k%2 { k } else { meg }
+        }
+        meg
+    }
 }
 
 
