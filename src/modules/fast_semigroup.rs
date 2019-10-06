@@ -30,6 +30,7 @@ impl Semigroup for Fast {
         }
         meg
     }
+    fn aquer(&self)->usize { self.sum_a / self.g1 }
 }
 
 

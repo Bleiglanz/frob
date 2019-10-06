@@ -20,6 +20,7 @@ pub struct Semi {
     pub e: usize,
     pub c: usize,
     pub a1: usize,
+    pub aquer: usize,
 }
 
 impl Semi {
@@ -31,6 +32,7 @@ impl Semi {
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         let double_avg_a = 2 * sum / apery.len();
         let gen_set = gens;
+        let aquer = sum / g1;
         assert!(g1 < min_a);
         Semi {
             apery,
@@ -45,6 +47,7 @@ impl Semi {
             gen_set: gen_set,
             c: max_a - g1 + 1,
             a1: a1,
+            aquer: aquer,
         }
     }
 }

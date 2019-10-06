@@ -22,7 +22,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
     let full = prepare_generators(modul,residue,&raw);
 
     let mut out = std::fs::File::create(format!("./outsat_mod{}residue{},p_n{}to{}.csv", modul, residue, start, stop)).expect("Unable to create file");
-    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); max_even_gap(S); durch_pn\n";
+    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S); pi(3p_n);n*n-f\n";
     out.write_all(head.as_bytes()).expect("head?");
 
     print!("{}", head);
@@ -43,17 +43,18 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
 
             let max_even_gap = res2.max_even_gap();
 
-            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8}\n",
+            let pi3p = raw.iter().filter(|x|{**x<=(3*res2.m())}).count();
+
+            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8},{:8}\n",
                                   modul, residue,
-                                  begin_slice+1, end_slice,
+                                  begin_slice+2, end_slice,
                                   full[begin_slice], full[end_slice - 1],
                                   res2.m(), res2.e(),
                                   res2.count_set, res2.f(), res2.f() as i64 -3*res2.m() as i64,
                                   if saturated { "saturated" } else { "         " },
-                                  res2.u, max_even_gap, max_even_gap as f64 / res2.m() as f64
-                                  ,
+                                  res2.u, max_even_gap,
+                                  pi3p,(begin_slice+2) as i64 *(begin_slice+2) as i64 -res2.f() as i64
             );
-
 
             print!("{}", ausgabe);
             if saturated {
