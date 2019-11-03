@@ -133,10 +133,11 @@ impl WilfSet {
         //
         // neu
         //
-        html.push_str(&get_apery_for_modulus(&self,self.c));
+        //html.push_str(&get_apery_for_modulus(&self,self.c));
 
         let mut res_html = String::new();
-        res_html.push_str(r#"<div class="l-box-lrg pure-u-1 pure-u-md-5-5">"#);
+        res_html.push_str(r#"<html><head></head><body>"#);
+        res_html.push_str(&html.to_string());
         let wilfstr = &format!("<script>document.write(({}/{}).toFixed(4));</script>",self.count_set,self.c);
         res_html.push_str(&format!("{:?} <strong>e</strong>={},<strong>c</strong>={},<strong>#set</strong>={},<strong>#gaps=</strong>{}  <strong>e*#set-c=</strong>{} ratio: {}<br/>",
                                    self.gen_set,self.e,self.maxgap+1,self.count_set, self.count_gap, self.defect, wilfstr));
@@ -144,30 +145,8 @@ impl WilfSet {
         res_html.push_str(&format!(" (e-2)*max_a {} - e*min_diag {} = &nbsp;&nbsp;{} verglichen mit (e-2)(g1-1) {}<br/>",
                                    (self.e-2)*max_apery,self.e*min_diag, (self.e-2)*max_apery-self.e*min_diag,(self.e-2)*(self.g1-1)));
         res_html.push_str(&format!("Apery {:?} Max gap {} double_avg {}",self.apery, self.c-1,self.double_avg_a));
-
-        let mut neuerinput:String = String::new();
-        for u in self.gen_set.iter() {
-            neuerinput.push_str(&format!("{} ",u));
-        }
-        res_html.push_str(&format!(r#"
-
-            <form method="post" action="/">
-            <input id="numbers" type="hidden" name="numbers" value="{}">
-            <input id="samples" type="hidden" name="samples" value="100">
-            <button type="submit" class="pure-button">hier weitermachen</button>
-            </form>
-
-        "#, neuerinput));
-        res_html.push_str("</p></div>");
-
-        if "Input"==title{
-            html.push_str(&res_html);
-            html.push_str("</div>");
-            html
-        } else {
-            res_html
-        }
-
+        res_html.push_str("</p><body><html>");
+        res_html
     }
 }
 

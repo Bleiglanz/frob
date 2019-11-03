@@ -5,6 +5,7 @@ use clap::{Arg, App};
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;
+use frob::modules::wilf::{WilfSet, generatewilf};
 
 
 fn prepare_generators(modul: usize, residue: usize, allgen:&[usize]) -> Vec<usize>{
@@ -22,7 +23,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
     let full = prepare_generators(modul,residue,&raw);
 
     let mut out = std::fs::File::create(format!("./outsat_mod{}residue{},p_n{}to{}.csv", modul, residue, start, stop)).expect("Unable to create file");
-    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S); pi(3p_n);n*n-f\n";
+    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S);   sum(A); d_min; 2g_n - fn\n";
     out.write_all(head.as_bytes()).expect("head?");
 
     print!("{}", head);
@@ -43,9 +44,15 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
 
             let max_even_gap = res2.max_even_gap();
 
-            let pi3p = raw.iter().filter(|x|{**x<=(3*res2.m())}).count();
+            let g_n = res2.count_gap;
 
-            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8},{:8}\n",
+            let d_min = (2*res2.sum_apery() / (res2.m())) - (res2.f() + res2.m());
+
+            //let pi3p = raw.iter().filter(|x|{**x<=(3*res2.m())}).count();
+            assert_eq!(res2.f()+res2.m(),res2.max_apery(),"max apery ist fn+p");
+            assert_eq!(0, res2.f()+d_min +1 - 2*g_n);
+            assert_eq!(d_min,res2.count_gap - res2.count_set);
+            let ausgabe = format!("{:5};{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8};{:8};{:8}\n",
                                   modul, residue,
                                   begin_slice+2, end_slice,
                                   full[begin_slice], full[end_slice - 1],
@@ -53,10 +60,16 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
                                   res2.count_set, res2.f(), res2.f() as i64 -3*res2.m() as i64,
                                   if saturated { "saturated" } else { "         " },
                                   res2.u, max_even_gap,
-                                  pi3p,(begin_slice+2) as i64 *(begin_slice+2) as i64 -res2.f() as i64
-            );
+                                  res2.sum_a, d_min, 2*g_n-res2.f());
+
 
             print!("{}", ausgabe);
+            //let ws:WilfSet = generatewilf(&gens);
+            //println!("Wilf-e {} neu-e {}",ws.e,res2.e());
+            //let html_title = &format!("./{}_Primzahl_{}.html",begin_slice+2,res2.m());
+            //let mut outhtml = std::fs::File::create(html_title).expect("Unable to create file");
+            //outhtml.write_all(ws.to_html(html_title).as_bytes()).expect("html?");
+
             if saturated {
                 out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
             }

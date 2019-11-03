@@ -36,6 +36,7 @@ impl Semigroup for Fast {
 
 impl Fast {
     fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>, u:usize) -> Self {
+        //println!("sum {}, g1 {}, count_set {}, apery {:?}",sum,g1,count_set,apery);
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         Fast {
             max_a,
