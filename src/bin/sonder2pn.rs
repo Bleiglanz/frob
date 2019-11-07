@@ -13,7 +13,7 @@ fn frobenius(modul: usize, residue: usize, start: usize) {
     let raw: Vec<usize> = primal::Primes::all().take(8000000).collect();
     let full = prepare_generators(modul, residue, &raw);
     let mut out = std::fs::File::create(format!("./ausreisserfuer2pn_mn{}.csv", start)).expect("Unable to create file");
-    let head = "n        ; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S);   pi(2p_n);erz\n";
+    let head = "  n  ;     p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S);  fne(S);pi(2p_n); e_n*s_n-c;  anzerz;erz\n";
     out.write_all(head.as_bytes()).expect("head?");
     print!("{}", head);
 
@@ -63,14 +63,14 @@ fn frobenius(modul: usize, residue: usize, start: usize) {
         assert_eq!(res2.f() + res2.m(), res2.max_apery(), "max apery ist fn+p");
         assert_eq!(0, res2.f() + d_min + 1 - 2 * g_n);
         assert_eq!(d_min, res2.count_gap - res2.count_set);
-        let ausgabe = format!("{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8};{:?}\n",
-                              begin_slice + 1,
+        let ausgabe = format!("{:5};{:8};{:8};{:8};{:8};{:8};{:8};{:10};{};{:8};{:8};{:8};{:10};{:8};{:?}\n",
+                              begin_slice + 2,
                               full[begin_slice], full[end_slice],
                               res2.m(), res2.e(),
                               res2.count_set, res2.f(), res2.f() as i64 - 3 * res2.m() as i64,
                               if saturated { "saturated" } else { "         " },
                               res2.u, max_even_gap,
-                              pi_2pn,gens);
+                              pi_2pn, res2.e()*res2.count_set - res2.c() ,gens.len(),gens);
 
         print!("{}", ausgabe);
         out.write_all(ausgabe.as_bytes()).expect("ausgabe??");
