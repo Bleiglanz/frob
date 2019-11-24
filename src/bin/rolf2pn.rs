@@ -12,15 +12,13 @@ fn prepare_generators(modul: usize, residue: usize, allgen: &[usize]) -> Vec<usi
     allgen.iter().filter(|x| { residue == *x % modul }).map(|x| { *x }).collect()
 }
 
-fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
+fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, a:usize, b:usize) {
     let raw: Vec<usize> = primal::Primes::all().take(8000000).collect();
-
-    //let raw:Vec<usize> = (1..8000000).map(|x|{(x*(3*x-1))/2}).collect();
 
     let full = prepare_generators(modul, residue, &raw);
 
-    let mut out = std::fs::File::create(format!("./fuer2pn_mod{}residue{},p_n{}to{}.csv", modul, residue, start, stop)).expect("Unable to create file");
-    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S);   pi(2p_n)\n";
+    let mut out = std::fs::File::create(format!("./fuer2pn_mod{}residue{}_lt{}div{}_nfrom{}to{}.csv", modul, residue,a,b, start, stop)).expect("Unable to create file");
+    let head = "modul; resi;begin_slice;end_slice; p_n;   p_n+k;    m(S);    e(S);  #(S<F);    f(S);f(S)-3m(S);   stable;    u(S); fne(S);   pi((a/b)p_n)\n";
     out.write_all(head.as_bytes()).expect("head?");
 
     print!("{}", head);
@@ -30,16 +28,17 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
         let mut end_slice = begin_slice;
         let p = full[begin_slice];
         loop {
-            if full[end_slice+1] < 2 * p {
+            if full[end_slice+1]*b < a * p {
                 end_slice += 1;
             } else {
                 break;
             }
+            if(end_slice >100_000_000) { panic!("overflow")};
         }
 
-        let pi_2pn = raw.iter().filter(|x|{**x<2*p}).count();
+        let pi_a_b_pn = raw.iter().filter(|x|{**x*b<a*p}).count();
 
-        print!("start {} end_slice {} prime p {}; pi(2pn) {}",start,end_slice,p,pi_2pn);
+        print!("start {} end_slice {} prime p {}; pi(2pn) {}",start,end_slice,p,pi_a_b_pn);
 
         let gens: &[usize] = &full[begin_slice..end_slice+1];
 
@@ -65,7 +64,7 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
                               res2.count_set, res2.f(), res2.f() as i64 - 3 * res2.m() as i64,
                               if saturated { "saturated" } else { "         " },
                               res2.u, max_even_gap,
-                              pi_2pn);
+                              pi_a_b_pn);
 
 
         print!("{}", ausgabe);
@@ -104,6 +103,16 @@ fn main() {
             .required(true)
             .default_value("10")
         )
+        .arg(Arg::with_name("afak")
+            .help("a for search all q st q < (a/b) p_n")
+            .required(true)
+            .default_value("2")
+        )
+        .arg(Arg::with_name("bfak")
+            .help("b for search all q st q < (a/b) p_n")
+            .required(true)
+            .default_value("1")
+        )
         .get_matches();
 
     let modul: usize = matches.value_of("modul").unwrap().parse().unwrap();
@@ -112,5 +121,8 @@ fn main() {
     let start: usize = matches.value_of("start").unwrap().parse().unwrap();
     let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
 
-    frobenius(modul, residue, start-1, stop-1);
+    let afak: usize = matches.value_of("afak").unwrap().parse().unwrap();
+    let bfak: usize = matches.value_of("bfak").unwrap().parse().unwrap();
+
+    frobenius(modul, residue, start-1, stop-1,afak,bfak);
 }
