@@ -23,9 +23,9 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, a_start: u
 
     print!("{}", head);
 
-    for j in 0..20 {
-        let a: usize = 20 * a_start + j * b_start;
-        let b: usize = 20 * b_start;
+    for j in 0..1 {
+        let a: usize = 1 * a_start + j * b_start;
+        let b: usize = 1 * b_start;
         for begin_slice in start..stop {
             let mut end_slice = begin_slice;
             let p = full[begin_slice];
