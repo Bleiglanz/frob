@@ -13,7 +13,7 @@ fn cellvalue(gen:&[usize],i:usize,j:usize) -> usize {
 }
 
 fn dijkstra(gen:&[usize])-> usize {
-    println!("Dijkstra...");
+    println!("Dijkstra...nie implementiert??");
 
     let maxgen = *gen.iter().max().unwrap();
     use frob::modules::fast_semigroup::fast;
