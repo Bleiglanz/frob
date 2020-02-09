@@ -1,4 +1,5 @@
 use super::Semigroup;
+use crate::modules::math::gcd_vec;
 
 #[derive(Debug, Clone)]
 pub struct Fast {
@@ -36,7 +37,7 @@ impl Semigroup for Fast {
 
 impl Fast {
     fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>, u:usize) -> Self {
-        //println!("sum {}, g1 {}, count_set {}, apery {:?}",sum,g1,count_set,apery);
+        println!("sum {}, g1 {}, count_set {}, apery {:?}",sum,g1,count_set,apery);
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         Fast {
             max_a,
@@ -52,13 +53,11 @@ impl Fast {
 }
 
 
-pub fn fast(inputnumbers: &[usize]) -> Fast {
+pub fn fast(input: &[usize]) -> Fast {
 
-    // nicht nötig wenn nur primzahlen richtig sortiert reinkommen
-    // teilerfremd machen und sortieren
-    // let d = gcd_vec(inputnumbers);
-    // let mut input: Vec<usize> = inputnumbers.iter().map(|x| (x / d) as usize).collect();
-    // input.sort();
+    let d = gcd_vec(input);
+    let mut inputnumbers: Vec<usize> = input.iter().map(|x| (x / d) as usize).collect();
+    inputnumbers.sort();
     let maximal_input: usize = *inputnumbers.last().unwrap();
     let width=2*maximal_input;
     let m: usize = *inputnumbers.first().unwrap();
@@ -67,7 +66,7 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
     let mut window = vec![-1isize; width]; // fenster hat die länge 2max
     let mut i: usize = m; // startindex
     let mut windowindex = m; // am anfang = i
-    let mut runlength = 1usize; // anzahl aufeinanderfoldender hits
+    let mut runlength = 0usize; // anzahl aufeinanderfoldender hits
     let mut hit: bool = false;
     let mut max_apery:usize = m;
     let mut sum_apery:usize = 0;
@@ -109,10 +108,6 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
         hit = false;
         i += 1;
         if windowindex == width - 1 {
-            //for j in 0..maximal_input {
-            //    window[j] = window[j + maximal_input];
-            //}
-            //copy_within_a_slice(&mut window,maximal_input, 0, maximal_input);
             let (dst, src) = window.split_at_mut(maximal_input);
             dst[0..maximal_input].clone_from_slice(&src[..maximal_input]);
             windowindex = maximal_input;
@@ -123,12 +118,20 @@ pub fn fast(inputnumbers: &[usize]) -> Fast {
     Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset,max_atom)
 }
 
-//fn copy_within_a_slice<T: Clone>(v: &mut [T], from: usize, to: usize, len: usize) {
-//    if from > to {
-//        let (dst, src) = v.split_at_mut(from);
-//        dst[to..to + len].clone_from_slice(&src[..len]);
-//    } else {
-//        let (src, dst) = v.split_at_mut(to);
-//        dst[..len].clone_from_slice(&src[from..from + len]);
-//    }
-//}
+#[cfg(test)]
+mod test {
+    use crate::modules::fast_semigroup::{fast};
+    use crate::modules::Semigroup;
+
+    #[test]
+    fn zwo_drei(){
+        let s= fast(&vec![2,3]);
+        assert_eq!(1,s.f(),"semigroup 2,3 hat f=1");
+    }
+    #[test]
+    fn others(){
+        assert_eq!(250,fast(&vec![21,35,44,67]).f());
+        assert_eq!(1,fast(&vec![2,3,44,67]).f());
+        assert_eq!(5494,fast(&vec![121,235,444,9867]).f());
+    }
+}

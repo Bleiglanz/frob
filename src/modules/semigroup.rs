@@ -55,7 +55,6 @@ impl Semi {
 
 pub fn semi(inputnumbers: &[usize]) -> Semi {
 
-    // nicht nötig wenn nur primzahlen richtig sortiert reinkommen
     // teilerfremd machen und sortieren
     // let d = gcd_vec(inputnumbers);
     // let mut input: Vec<usize> = inputnumbers.iter().map(|x| (x / d) as usize).collect();

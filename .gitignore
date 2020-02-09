@@ -1,4 +1,7 @@
 *.iml
 .idea
 /target
+/resource/out
 **/*.rs.bk
+**/*.csv
+**/*.mp4
