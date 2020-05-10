@@ -35,7 +35,7 @@ for s in range(5,753):
 
    fig = plt.figure()
    ax3 = fig.add_subplot(111)
-   ax3.set_title("The quotient $f_\lambda({0})$ divded by ${0}$ as a function of $(1+\lambda)$".format(p))
+   ax3.set_title("The quotient $f_\lambda({0})$ divided by ${0}$ as a function of $(1+\lambda)$".format(p))
    ax3.set_xlabel('$(1+\lambda)$')
    ax3.set_ylabel("$f_\lambda({0})/{0}$".format(p)) 
    xdata = data['pnk']/data['pn']
