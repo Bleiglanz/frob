@@ -26,4 +26,5 @@ pub trait Semigroup {
     fn contains(&self, n:usize) -> bool;
     fn max_even_gap(&self) -> usize;
     fn aquer(&self) -> usize;
+    fn genset(&self)->Vec<usize>;
 }

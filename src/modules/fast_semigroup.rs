@@ -3,7 +3,7 @@ use crate::modules::math::gcd_vec;
 
 #[derive(Debug, Clone)]
 pub struct Fast {
-    apery: Vec<usize>,
+    pub apery: Vec<usize>,
     pub max_a: usize,
     pub sum_a: usize,
     pub g1: usize,
@@ -11,6 +11,7 @@ pub struct Fast {
     pub count_gap: usize,
     pub e: usize,
     pub u: usize,
+    pub genset:Vec<usize>,
 }
 
 impl Semigroup for Fast {
@@ -32,11 +33,12 @@ impl Semigroup for Fast {
         meg
     }
     fn aquer(&self)->usize { self.sum_a / self.g1 }
+    fn genset(&self)->Vec<usize> { self.genset.clone() }
 }
 
 
 impl Fast {
-    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>, u:usize) -> Self {
+    fn new(count_set: usize, max_a: usize, g1: usize, mingencount:usize, sum:usize, apery:Vec<usize>, u:usize, genset:Vec<usize>) -> Self {
         //println!("sum {}, g1 {}, count_set {}, apery {:?}",sum,g1,count_set,apery);
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
         Fast {
@@ -47,14 +49,14 @@ impl Fast {
             count_gap,
             e: mingencount,
             apery,
-            u
+            u,
+            genset
         }
     }
 }
 
 
 pub fn fast(input: &[usize]) -> Fast {
-
     let d = gcd_vec(input);
     let mut inputnumbers: Vec<usize> = input.iter().map(|x| (x / d) as usize).collect();
     inputnumbers.sort();
@@ -72,6 +74,7 @@ pub fn fast(input: &[usize]) -> Fast {
     let mut sum_apery:usize = 0;
     let mut minimal_generators:usize = 1;
     let mut max_atom = m;
+    let mut genset:Vec<usize> = Vec::new();
     window[0]=0;
     while runlength < m {
         let residue = i % m;
@@ -96,8 +99,9 @@ pub fn fast(input: &[usize]) -> Fast {
                     aperyset[residue] = i;
                     sum_apery+=i;
                     if i>max_apery { max_apery = i}
-                    if 0==window[windowindex - k] {
+                    if 0==window[windowindex - *k] {
                         minimal_generators+=1;
+                        genset.push(i);
                         if max_atom < i {max_atom=i};
                     }
                     break;
@@ -115,7 +119,8 @@ pub fn fast(input: &[usize]) -> Fast {
             windowindex += 1;
         }
     }
-    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset,max_atom)
+    genset.push(m);
+    Fast::new(count_set-m, max_apery, m, minimal_generators, sum_apery,aperyset,max_atom, genset)
 }
 
 #[cfg(test)]
