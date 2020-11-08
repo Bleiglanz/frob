@@ -23,8 +23,8 @@ fn t4list(max:usize)->Vec<usize>{
 fn frobenius(ts:Vec<usize>) {
 
     let raw:Vec<usize>= primal::Primes::all().take(8000000).collect();
-    let mut out = std::fs::File::create(format!("./schrittw_t4_{}.csv",ts.len())).expect("Unable to create file");
-    let head = "      t; erste;   letzte;    m(S);     e(S);    f(S); f(S)/m(S) ; size  \n";
+    let mut out = std::fs::File::create(format!("./schrittw_t4_frage_nach_prim_{}.csv",ts.len())).expect("Unable to create file");
+    let head = "      t; erste;   letzte;    m(S);     e(S);    f(S); f(S)/m(S) ; size ; <5.5; 6t-1prim? \n";
     out.write_all(head.as_bytes()).expect("head?");
     print!("{}", head);
 
@@ -52,11 +52,21 @@ fn frobenius(ts:Vec<usize>) {
         assert_eq!(res2.f()+res2.m(),res2.max_apery(),"max apery ist fn+p");
         assert_eq!(0, res2.f()+d_min +1 - 2*g_n);
         assert_eq!(d_min,res2.count_gap - res2.count_set);
-        let ausgabe = format!("{:8};{:8};{:8};{:8};{:8};{:8};{};{:?}\n",
+        let state = if (res2.f() as f64 / res2.m() as f64) < 5.5 {
+            "AUSREISSER"
+        } else {
+            ""
+        };
+        let sixtm1 = if primal::is_prime(6*t as u64 -1){
+            "6t-1 prim"
+        } else {
+            ""
+        };
+        let ausgabe = format!("{:8};{:8};{:8};{:8};{:8};{:8};{:1.8};{:5};{};{}\n",
                               t,
                               first, last,
                               res2.m(), res2.e(),
-                              res2.f(), res2.f() as f64 / res2.m() as f64, full.len());
+                              res2.f(), res2.f() as f64 / res2.m() as f64, full.len(), state, sixtm1);
 
         print!("{}", ausgabe);
         if res2.f_over_m() < 20f64 {
