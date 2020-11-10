@@ -7,12 +7,13 @@ use frob::modules::Semigroup;
 use std::io::Write;
 
 fn t4list(max:usize)->Vec<usize>{
-    let mut res:Vec<usize> = Vec::with_capacity(20000);
+    let mut res:Vec<usize> = Vec::with_capacity(200000);
     let mut zaehler = 0;
-    for t in 1..u64::max_value() as u64 {
-        if primal::is_prime(1+4*t) && primal::is_prime(3+4*t) && primal::is_prime(1+6*t) {
+    for t in 286807..u64::max_value() as u64 {
+        if primal::is_prime(1+4*t) && primal::is_prime(3+4*t) && primal::is_prime(1+6*t){
             res.push(t as usize);
             zaehler+=1;
+            println!("teste t={} von max={}=",t,max);
         }
         if zaehler>=max { break; }
     }
@@ -24,7 +25,7 @@ fn frobenius(ts:Vec<usize>) {
 
     let raw:Vec<usize>= primal::Primes::all().take(8000000).collect();
     let mut out = std::fs::File::create(format!("./schrittw_t4_frage_nach_prim_{}.csv",ts.len())).expect("Unable to create file");
-    let head = "      t; erste;   letzte;    m(S);     e(S);    f(S); f(S)/m(S) ; size ; <5.5; 6t-1prim? \n";
+    let head = "      t; erste;   letzte;    m(S);     e(S);    f(S); f(S)/m(S) ; size ; <5.5; 6t-1prim?; 4t-1prim?; 4t-3prim? \n";
     out.write_all(head.as_bytes()).expect("head?");
     print!("{}", head);
 
@@ -62,11 +63,23 @@ fn frobenius(ts:Vec<usize>) {
         } else {
             ""
         };
-        let ausgabe = format!("{:8};{:8};{:8};{:8};{:8};{:8};{:1.8};{:5};{};{}\n",
+        let viertm1 = if primal::is_prime(4*t as u64 -1){
+            "4t-1 prim"
+        } else {
+            ""
+        };
+        let viertm3 = if primal::is_prime(4*t as u64 -3){
+            "4t-3 prim"
+        } else {
+            ""
+        };
+
+
+        let ausgabe = format!("{:8};{:8};{:8};{:8};{:8};{:8};{:1.8};{:5};{};{};{};{}\n",
                               t,
                               first, last,
                               res2.m(), res2.e(),
-                              res2.f(), res2.f() as f64 / res2.m() as f64, full.len(), state, sixtm1);
+                              res2.f(), res2.f() as f64 / res2.m() as f64, full.len(), state, sixtm1,viertm1,viertm3);
 
         print!("{}", ausgabe);
         if res2.f_over_m() < 20f64 {
