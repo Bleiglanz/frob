@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate crossbeam;
 
-use clap::{Arg, App};
+use clap::Parser;
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;
@@ -96,40 +96,23 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize) {
     }
 }
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Name of the person to greet
+    #[arg(short, long, default_value="2")]
+    module: usize,
+    #[arg(short, long, default_value="1")]
+    residue: usize,
+    #[arg(short, long, default_value="2")]
+    start: usize,
+    #[arg(short, long, default_value="10")]
+    stop: usize,
+}
+
 fn main() {
-    let matches = App::new("semiprog")
-        .version("0.0")
-        .author("Anton Rechenauer")
-        .about("compute frobenius")
-        .arg(Arg::with_name("modul")
-            .help("the modulus, in which arithmetic progression to search")
-            .required(true)
-            .default_value("2")
-        )
-        .arg(Arg::with_name("residue")
-            .help("the residue, consider only primes congruent this mod modul")
-            .required(true)
-            .default_value("1")
-        )
-        .arg(Arg::with_name("start")
-            .help("where to begin, a n th prime")
-            .required(true)
-            .default_value("1")
-        )
-        .arg(Arg::with_name("stop")
-            .help("where to stop, a n th prime")
-            .required(true)
-            .default_value("10")
-        )
-        .get_matches();
-
-    let modul: usize = matches.value_of("modul").unwrap().parse().unwrap();
-    let residue: usize = matches.value_of("residue").unwrap().parse().unwrap();
-
-    let start: usize = matches.value_of("start").unwrap().parse().unwrap();
-    let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
-
-    frobenius(modul, residue, start, stop);
+    let args = Args::parse();
+    frobenius(args.module, args.residue, args.start, args.stop);
 }
 
 

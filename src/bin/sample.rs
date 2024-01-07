@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate crossbeam;
 
-use clap::{Arg, App};
+use clap::Parser;
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;
@@ -60,35 +60,29 @@ fn frobenius(modul: usize, residue: usize, start: usize, stop: usize, out:&mut F
     }
 }
 
-fn main() {
-    let matches = App::new("semiprog")
-        .version("0.0")
-        .author("Anton Rechenauer")
-        .about("compute frobenius")
-        .arg(Arg::with_name("modul")
-            .help("the max modulus, in which arithmetic progression to search")
-            .required(true)
-            .default_value("2")
-        )
-        .arg(Arg::with_name("stop")
-            .help("where to stop, a number the n th prime shall be below")
-            .required(true)
-            .default_value("12")
-        )
-        .get_matches();
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Name of the person to greet
+    #[arg(short, long, default_value="2")]
+    module: usize,
+    #[arg(short, long, default_value="1")]
+    residue: usize,
+    #[arg(short, long, default_value="2")]
+    start: usize,
+    #[arg(short, long, default_value="10")]
+    stop: usize,
+}
 
-    let maxmodul: usize = matches.value_of("modul").unwrap().parse().unwrap();
-    let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
-    let filename = format!("sample_semigroups_maxmod{}_upto{}.csv",maxmodul,stop);
+fn main() {
+    let args = Args::parse();
+    let filename = format!("sample_semigroups_maxmod{}_upto{}.csv",args.module,args.stop);
     let mut out = std::fs::File::create(filename).expect("Unable to create file");
-    for m in 2..maxmodul+1 {
+    for m in 2..args.module+1 {
         for a in 1..m {
             if 1==gcd(a,m) {
-                frobenius(m, a, 1, stop, &mut out);
+                frobenius(args.module, a, args.start, args.stop, &mut out);
             }
         }
     }
-
-
-
 }

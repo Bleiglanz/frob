@@ -11,7 +11,6 @@ pub struct Semi {
     pub apery: Vec<usize>,
     pub max_a: usize,
     pub sum_a: usize,
-    double_avg_a: usize,
     pub maxgap: usize,
     pub g1: usize,
     pub count_set: usize,
@@ -30,7 +29,6 @@ impl Semi {
         let a1: usize = apery[1];
         let sum = apery.iter().sum();
         let count_gap = (sum - ((g1 - 1) * g1) / 2) / g1;
-        let double_avg_a = 2 * sum / apery.len();
         let gen_set = gens;
         let aquer = sum / g1;
         assert!(g1 < min_a);
@@ -38,7 +36,6 @@ impl Semi {
             apery,
             max_a,
             sum_a: sum,
-            double_avg_a,
             g1: g1,
             maxgap: max_a - g1,
             count_set,

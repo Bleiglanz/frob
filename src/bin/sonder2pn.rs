@@ -1,6 +1,5 @@
 extern crate crossbeam;
 
-use clap::{Arg, App};
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;

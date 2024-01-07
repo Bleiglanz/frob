@@ -1,7 +1,6 @@
 extern crate clap;
 extern crate crossbeam;
 
-use clap::{Arg, App};
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;
@@ -89,18 +88,7 @@ fn frobenius(ts:Vec<usize>) {
 }
 
 fn main() {
-    let matches = App::new("semiprog")
-        .version("0.0")
-        .author("Anton Rechenauer")
-        .about("compute frobenius")
-        .arg(Arg::with_name("stop")
-            .help("where to stop, a n th prime")
-            .required(true)
-            .default_value("10")
-        )
-        .get_matches();
-
-    let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
+    let stop: usize = 20;
     let ts = t4list(stop);
     println!("t4 list bis {} ist {:?}",stop,ts);
     frobenius( ts );

@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate crossbeam;
 
-use clap::{Arg, App};
+use clap::Parser;
 use frob::modules::fast_semigroup::{Fast, fast};
 use frob::modules::Semigroup;
 use std::io::Write;
@@ -79,30 +79,20 @@ fn frobenius(start: usize, stop: usize, power:usize) {
     }
 }
 
-fn main() {
-    let matches = App::new("semiprog")
-        .version("0.0")
-        .author("Anton Rechenauer")
-        .about("compute frobenius for n-th powers")
-        .arg(Arg::with_name("start")
-            .help("where to begin")
-            .required(true)
-            .default_value("1")
-        )
-        .arg(Arg::with_name("stop")
-            .help("where to stop")
-            .required(true)
-            .default_value("10")
-        )
-        .arg(Arg::with_name("power")
-            .help("take the sum of n-th powers")
-            .required(true)
-            .default_value("10")
-        )
-        .get_matches();
 
-    let start: usize = matches.value_of("start").unwrap().parse().unwrap();
-    let stop: usize = matches.value_of("stop").unwrap().parse().unwrap();
-    let power: usize = matches.value_of("power").unwrap().parse().unwrap();
-    frobenius(start, stop,power);
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Name of the person to greet
+    #[arg(short, long, default_value="2")]
+    power:usize,
+    #[arg(short, long, default_value="2")]
+    start: usize,
+    #[arg(short, long, default_value="10")]
+    stop: usize,
+}
+
+fn main() {
+    let args = Args::parse();
+    frobenius(args.start, args.stop, args.power);
 }
